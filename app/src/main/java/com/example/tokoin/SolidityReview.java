@@ -54,10 +54,10 @@ public class SolidityReview extends AppCompatActivity {
             try {
                 JSONObject obj = new JSONObject(compiled);
                 String hash = obj.getJSONObject("result").getString("code");
-                String res = network.postAbi(hash);
+                String res = network.postBin(hash);
                 obj = new JSONObject(res);
                 String add = obj.getString("result");
-                Toast.makeText(getApplicationContext(),res,Toast.LENGTH_LONG);
+                Toast.makeText(getApplicationContext(),add,Toast.LENGTH_LONG);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

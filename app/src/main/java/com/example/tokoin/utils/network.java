@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.net.URL;
 
 public class network {
+    private static final int commandLength = 12;
+    
     private static String postData(String data){
         String urlString = "http://192.168.1.6:8545";// geth url
         OutputStream out = null;
@@ -47,8 +49,8 @@ public class network {
         return postData("{\"jsonrpc\":\"2.0\",\"method\":\"eth_compileSolidity\",\"params\":[" + sol + "],\"id\":1}");
     }
 
-    public static String postAbi(String abi){
-        return postData("{\"jsonrpc\":\"2.0\",\"method\":\"eth_sendRawTransaction\",\"params\":["+ abi +"],\"id\":2}");
+    public static String postBin(String bin){
+        return postData("{\"jsonrpc\":\"2.0\",\"method\":\"eth_sendRawTransaction\",\"params\":["+ bin +"],\"id\":2}");
     }
 
     public static String postCreate(String create){
@@ -67,26 +69,46 @@ public class network {
         return postData("{\"jsonrpc\":\"2.0\",\"method\":\"eth_sendTransaction\",\"params\":["+ revocation +"],\"id\":5}");
     }
 
-    private static String sendData(String data) throws IOException {
+
+    private static byte[] commandToBytes(String command){
+        byte[] bytes = new byte[commandLength];
+        for(int i=0; i<command.length(); ++i){
+            bytes[i]=(byte)command.charAt(i);
+        }
+        return bytes;
+    }
+
+    private static String bytesToCommand(byte[] bytes){
+        char[] chars = new char[commandLength];
+        for(int i=0; i<commandLength; ++i) {
+            if (bytes[i] != 0x0) {
+                chars[i] = (char) bytes[i];
+            }
+        }
+        String command = new String(chars);
+        return command;
+    }
+
+    private static String sendData(byte[] data) throws IOException {
         Socket socket = new Socket("http://192.168.1.6",3000);
         OutputStream outputStream = socket.getOutputStream();
-        outputStream.write(data.getBytes());
+        outputStream.write(data);
         return "Success!";
     }
 
-    public static String sendCreate(String create) throws IOException {
+    public static String sendCreate(byte[] create) throws IOException {
         return sendData(create);
     }
 
-    public static String sendModify(String modify) throws IOException {
+    public static String sendModify(byte[] modify) throws IOException {
         return sendData(modify);
     }
 
-    public static String sendTransfer(String transfer) throws IOException {
+    public static String sendTransfer(byte[] transfer) throws IOException {
         return sendData(transfer);
     }
 
-    public static String sendRevocation(String revocation) throws IOException {
+    public static String sendRevocation(byte[] revocation) throws IOException {
         return sendData(revocation);
     }
 
